@@ -95,9 +95,12 @@ class FetchProcess {
 
 	private FetchConnection conn;
 
-	FetchProcess(final Transport t, final Collection<RefSpec> f) {
+    private final int depth; 
+
+	FetchProcess(final Transport t, final Collection<RefSpec> f, final int d) {
 		transport = t;
 		toFetch = f;
+        depth = d;
 	}
 
 	void execute(final ProgressMonitor monitor, final FetchResult result)
@@ -188,9 +191,9 @@ class FetchProcess {
 					u.update(walk);
 					result.add(u);
 				} catch (IOException err) {
-					throw new TransportException(MessageFormat.format(JGitText
-							.get().failureUpdatingTrackingRef,
-							u.getLocalName(), err.getMessage()), err);
+                    throw new TransportException(MessageFormat.format(JGitText
+                            .get().failureUpdatingTrackingRef,
+                            u.getLocalName(), err.getMessage()), err);
 				}
 			}
 		} finally {
@@ -211,7 +214,7 @@ class FetchProcess {
 			throws TransportException {
 		try {
 			conn.setPackLockMessage("jgit fetch " + transport.uri);
-			conn.fetch(monitor, askFor.values(), have);
+			conn.fetch(monitor, askFor.values(), have, transport.local.getShallows(), depth);
 		} finally {
 			packLocks.addAll(conn.getPackLocks());
 		}

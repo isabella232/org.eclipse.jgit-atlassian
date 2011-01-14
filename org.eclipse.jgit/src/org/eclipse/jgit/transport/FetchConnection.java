@@ -108,16 +108,16 @@ public interface FetchConnection extends Connection {
 	 *             already used for fetch.
 	 */
 	public void fetch(final ProgressMonitor monitor,
-			final Collection<Ref> want, final Set<ObjectId> have)
+			final Collection<Ref> want, final Set<ObjectId> have, final Set<ObjectId> shallows, final int depth)
 			throws TransportException;
 
 	/**
-	 * Did the last {@link #fetch(ProgressMonitor, Collection, Set)} get tags?
+	 * Did the last {@link #fetch(ProgressMonitor, Collection, Set, Set, int)} get tags?
 	 * <p>
 	 * Some Git aware transports are able to implicitly grab an annotated tag if
 	 * {@link TagOpt#AUTO_FOLLOW} or {@link TagOpt#FETCH_TAGS} was selected and
 	 * the object the tag peels to (references) was transferred as part of the
-	 * last {@link #fetch(ProgressMonitor, Collection, Set)} call. If it is
+	 * last {@link #fetch(ProgressMonitor, Collection, Set, Set, int)} call. If it is
 	 * possible for such tags to have been included in the transfer this method
 	 * returns true, allowing the caller to attempt tag discovery.
 	 * <p>
@@ -131,7 +131,7 @@ public interface FetchConnection extends Connection {
 	public boolean didFetchIncludeTags();
 
 	/**
-	 * Did the last {@link #fetch(ProgressMonitor, Collection, Set)} validate
+	 * Did the last {@link #fetch(ProgressMonitor, Collection, Set, Set, int)} validate
 	 * graph?
 	 * <p>
 	 * Some transports walk the object graph on the client side, with the client
@@ -158,7 +158,7 @@ public interface FetchConnection extends Connection {
 	 * <p>
 	 * Callers that set a lock message <b>must</b> ensure they call
 	 * {@link #getPackLocks()} after
-	 * {@link #fetch(ProgressMonitor, Collection, Set)}, even if an exception
+	 * {@link #fetch(ProgressMonitor, Collection, Set, Set, int)}, even if an exception
 	 * was thrown, and release the locks that are held.
 	 *
 	 * @param message message to use when holding a pack in place.
@@ -167,7 +167,7 @@ public interface FetchConnection extends Connection {
 
 	/**
 	 * All locks created by the last
-	 * {@link #fetch(ProgressMonitor, Collection, Set)} call.
+	 * {@link #fetch(ProgressMonitor, Collection, Set, Set, int)} call.
 	 *
 	 * @return collection (possibly empty) of locks created by the last call to
 	 *         fetch. The caller must release these after refs are updated in

@@ -142,14 +142,16 @@ class MergeBaseGenerator extends Generator {
 				return null;
 			}
 
-			for (final RevCommit p : c.parents) {
-				if ((p.flags & IN_PENDING) != 0)
-					continue;
-				if ((p.flags & PARSED) == 0)
-					p.parseHeaders(walker);
-				p.flags |= IN_PENDING;
-				pending.add(p);
-			}
+            if (walker.repository == null || !walker.repository.getShallows().contains(c.getId())) { //slow, as it read "shallow" file -> optimise!
+			    for (final RevCommit p : c.parents) {
+    				if ((p.flags & IN_PENDING) != 0)
+    					continue;
+    				if ((p.flags & PARSED) == 0)
+    					p.parseHeaders(walker);
+    				p.flags |= IN_PENDING;
+    				pending.add(p);
+    			}
+            }
 
 			int carry = c.flags & branchMask;
 			boolean mb = carry == branchMask;

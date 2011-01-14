@@ -123,7 +123,7 @@ public class FetchCommand extends GitCommand<FetchResult> {
 			transport.setFetchThin(thin);
 
 			try {
-				FetchResult result = transport.fetch(monitor, refSpecs);
+				FetchResult result = transport.fetch(monitor, refSpecs, 0);
 				return result;
 
 			} catch (TransportException e) {
