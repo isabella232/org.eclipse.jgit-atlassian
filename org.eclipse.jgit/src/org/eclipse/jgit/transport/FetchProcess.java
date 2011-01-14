@@ -103,11 +103,14 @@ class FetchProcess {
 
 	private FetchConnection conn;
 
+	private final int depth;
+
 	private Map<String, Ref> localRefs;
 
-	FetchProcess(final Transport t, final Collection<RefSpec> f) {
+	FetchProcess(final Transport t, final Collection<RefSpec> f, final int d) {
 		transport = t;
 		toFetch = f;
+        depth = d;
 	}
 
 	void execute(final ProgressMonitor monitor, final FetchResult result)
@@ -244,7 +247,7 @@ class FetchProcess {
 			throws TransportException {
 		try {
 			conn.setPackLockMessage("jgit fetch " + transport.uri); //$NON-NLS-1$
-			conn.fetch(monitor, askFor.values(), have);
+			conn.fetch(monitor, askFor.values(), have, transport.local.getShallows(), depth);
 		} finally {
 			packLocks.addAll(conn.getPackLocks());
 		}
@@ -365,7 +368,8 @@ class FetchProcess {
 	}
 
 	private void expandSingle(final RefSpec spec, final Set<Ref> matched)
-			throws TransportException {
+			throws TransportException
+	{
 		final Ref src = conn.getRef(spec.getSource());
 		if (src == null) {
 			throw new TransportException(MessageFormat.format(JGitText.get().remoteDoesNotHaveSpec, spec.getSource()));
@@ -436,7 +440,7 @@ class FetchProcess {
 	}
 
 	private TrackingRefUpdate createUpdate(RefSpec spec, ObjectId newId)
-			throws TransportException {
+	throws TransportException {
 		Ref ref = localRefs().get(spec.getDestination());
 		ObjectId oldId = ref != null && ref.getObjectId() != null
 				? ref.getObjectId()

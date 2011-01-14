@@ -127,7 +127,7 @@ public class FetchCommand extends TransportCommand<FetchCommand, FetchResult> {
 				transport.setFetchThin(thin);
 				configure(transport);
 
-				FetchResult result = transport.fetch(monitor, refSpecs);
+				FetchResult result = transport.fetch(monitor, refSpecs, 0);
 				return result;
 			} finally {
 				transport.close();

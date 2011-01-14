@@ -780,7 +780,7 @@ public class TransportHttp extends HttpTransport implements WalkTransport,
 			try {
 				svc = new MultiRequestService(SVC_UPLOAD_PACK);
 				init(svc.getInputStream(), svc.getOutputStream());
-				super.doFetch(monitor, want, have, outputStream);
+				super.doFetch(monitor, want, have, shallows, outputStream);
 			} finally {
 				svc = null;
 			}

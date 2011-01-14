@@ -65,7 +65,7 @@ import org.eclipse.jgit.lib.Ref;
 abstract class BaseFetchConnection extends BaseConnection implements
 		FetchConnection {
 	public final void fetch(final ProgressMonitor monitor,
-			final Collection<Ref> want, final Set<ObjectId> have)
+			final Collection<Ref> want, final Set<ObjectId> have, final Set<ObjectId> shallows, final int depth)
 			throws TransportException {
 		fetch(monitor, want, have, null);
 	}

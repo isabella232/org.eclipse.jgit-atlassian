@@ -720,7 +720,7 @@ public abstract class Transport {
 	private List<RefSpec> fetch = Collections.emptyList();
 
 	/**
-	 * How {@link #fetch(ProgressMonitor, Collection)} should handle tags.
+	 * How {@link #fetch(ProgressMonitor, Collection, int)} should handle tags.
 	 * <p>
 	 * We default to {@link TagOpt#NO_TAGS} so as to avoid fetching annotated
 	 * tags during one-shot fetches used for later merges. This prevents
@@ -1082,7 +1082,7 @@ public abstract class Transport {
 	 *             incorrect.
 	 */
 	public FetchResult fetch(final ProgressMonitor monitor,
-			Collection<RefSpec> toFetch) throws NotSupportedException,
+			Collection<RefSpec> toFetch, final int depth) throws NotSupportedException,
 			TransportException {
 		if (toFetch == null || toFetch.isEmpty()) {
 			// If the caller did not ask for anything use the defaults.
@@ -1112,7 +1112,7 @@ public abstract class Transport {
 		}
 
 		final FetchResult result = new FetchResult();
-		new FetchProcess(this, toFetch).execute(monitor, result);
+		new FetchProcess(this, toFetch, depth).execute(monitor, result);
 		return result;
 	}
 
