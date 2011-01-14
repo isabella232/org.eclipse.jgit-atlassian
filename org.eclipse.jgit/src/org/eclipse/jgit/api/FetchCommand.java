@@ -133,7 +133,7 @@ public class FetchCommand extends GitCommand<FetchResult> {
 				if (credentialsProvider != null)
 					transport.setCredentialsProvider(credentialsProvider);
 
-				FetchResult result = transport.fetch(monitor, refSpecs);
+				FetchResult result = transport.fetch(monitor, refSpecs, 0);
 				return result;
 			} finally {
 				transport.close();

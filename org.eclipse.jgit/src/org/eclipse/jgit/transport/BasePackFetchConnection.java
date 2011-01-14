@@ -51,6 +51,7 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.jgit.JGitText;
@@ -173,6 +174,8 @@ public abstract class BasePackFetchConnection extends BasePackConnection
 
 	private boolean noDone;
 
+    private boolean shallow;
+
 	private String lockMessage;
 
 	private PackLock packLock;
@@ -181,6 +184,9 @@ public abstract class BasePackFetchConnection extends BasePackConnection
 	private TemporaryBuffer.Heap state;
 
 	private PacketLineOut pckState;
+
+    /** Shallow clone/fetch depth. */
+    private int depth;
 
 	/**
 	 * Create a new connection to fetch using the native git transport.
@@ -223,10 +229,11 @@ public abstract class BasePackFetchConnection extends BasePackConnection
 	}
 
 	public final void fetch(final ProgressMonitor monitor,
-			final Collection<Ref> want, final Set<ObjectId> have)
+			final Collection<Ref> want, final Set<ObjectId> have, final Set<ObjectId> shallow, final int depth)
 			throws TransportException {
 		markStartedOperation();
-		doFetch(monitor, want, have);
+        this.depth = depth;
+		doFetch(monitor, want, shallow, have);
 	}
 
 	public boolean didFetchIncludeTags() {
@@ -262,7 +269,7 @@ public abstract class BasePackFetchConnection extends BasePackConnection
 	 *             if any exception occurs.
 	 */
 	protected void doFetch(final ProgressMonitor monitor,
-			final Collection<Ref> want, final Set<ObjectId> have)
+			final Collection<Ref> want, final Set<ObjectId> have, final Set<ObjectId> shallow)
 			throws TransportException {
 		try {
 			markRefsAdvertised();
@@ -274,12 +281,16 @@ public abstract class BasePackFetchConnection extends BasePackConnection
 			}
 
 			if (sendWants(want)) {
+                sendShallows(monitor, shallow, depth);
+                sendEnd();
 				negotiate(monitor);
 
 				walk.dispose();
 				reachableCommits = null;
 				state = null;
 				pckState = null;
+
+                local.addShallows(pckIn.shallows);
 
 				receivePack(monitor);
 			}
@@ -400,10 +411,34 @@ public abstract class BasePackFetchConnection extends BasePackConnection
 		}
 		if (first)
 			return false;
-		p.end();
-		outNeedsEnd = false;
+
 		return true;
 	}
+
+    private void sendShallows(final ProgressMonitor monitor, final Set<ObjectId> shallows, final int depth) throws IOException {
+        final PacketLineOut p = statelessRPC ? pckState : pckOut;
+
+        if (!shallow)
+            return; //shallow is not supported by remote
+
+        for (final ObjectId o : shallows) {
+            p.writeString("shallow " + o.name());
+        }
+
+        if (depth > 0) {
+            monitor.beginTask("Requesting shallow fetch", 0);
+            monitor.endTask();
+            p.writeString("deepen " + depth);
+            pckIn.expectShallowInNextLine = true;
+        }
+    }
+
+    private void sendEnd() throws IOException
+    {
+        final PacketLineOut p = statelessRPC ? pckState : pckOut;
+        p.end();
+        outNeedsEnd = false;
+    }
 
 	private String enableCapabilities() throws TransportException {
 		final StringBuilder line = new StringBuilder();
@@ -428,6 +463,9 @@ public abstract class BasePackFetchConnection extends BasePackConnection
 		else if (wantCapability(line, OPTION_SIDE_BAND))
 			sideband = true;
 
+        if (wantCapability(line, OPTION_SHALLOW))
+            shallow = true;
+
 		if (statelessRPC && multiAck != MultiAck.DETAILED) {
 			// Our stateless RPC implementation relies upon the detailed
 			// ACK status to tell us common objects for reuse in future
@@ -449,8 +487,8 @@ public abstract class BasePackFetchConnection extends BasePackConnection
 		boolean receivedAck = false;
 		boolean receivedReady = false;
 
-		if (statelessRPC)
-			state.writeTo(out, null);
+        if (statelessRPC)
+            state.writeTo(out, null);
 
 		negotiateBegin();
 		SEND_HAVES: while (!receivedReady) {

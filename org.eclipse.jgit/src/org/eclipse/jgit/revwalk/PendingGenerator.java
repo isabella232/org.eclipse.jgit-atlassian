@@ -141,14 +141,16 @@ class PendingGenerator extends Generator {
 					produce = filter.include(walker, c);
 				}
 
-				for (final RevCommit p : c.parents) {
-					if ((p.flags & SEEN) != 0)
-						continue;
-					if ((p.flags & PARSED) == 0)
-						p.parseHeaders(walker);
-					p.flags |= SEEN;
-					pending.add(p);
-				}
+                if (walker.repository == null || !walker.repository.getShallows().contains(c.getId())) { //slow, as it read "shallow" file -> optimise!
+    				for (final RevCommit p : c.parents) {
+    					if ((p.flags & SEEN) != 0)
+    						continue;
+    					if ((p.flags & PARSED) == 0)
+    						p.parseHeaders(walker);
+    					p.flags |= SEEN;
+    					pending.add(p);
+				    }
+                }
 				walker.carryFlagsImpl(c);
 
 				if ((c.flags & UNINTERESTING) != 0) {

@@ -48,11 +48,14 @@ package org.eclipse.jgit.transport;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.jgit.JGitText;
 import org.eclipse.jgit.errors.PackProtocolException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.MutableObjectId;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.util.IO;
 import org.eclipse.jgit.util.RawParseUtils;
 
@@ -87,6 +90,8 @@ public class PacketLineIn {
 
 	private final byte[] lineBuffer;
 
+    boolean expectShallowInNextLine = false;
+    public Set<ObjectId> shallows = new HashSet<ObjectId>();
 	/**
 	 * Create a new packet line reader.
 	 *
@@ -98,8 +103,35 @@ public class PacketLineIn {
 		lineBuffer = new byte[SideBandOutputStream.SMALL_BUF];
 	}
 
+    private String readStringAndConsumeAllShallows() throws IOException {
+        for (;;){
+            final String line = readString();
+            if (line.startsWith("shallow ")) {
+                shallows.add(ObjectId.fromString(line.substring("shallow ".length())));
+            } else if (line.length() == 0) {
+                return readString();
+            } else {
+               throw new PackProtocolException("expected \"shallow {objectId}\", got " + line);
+            }
+        }
+    }
+
 	AckNackResult readACK(final MutableObjectId returnedId) throws IOException {
-		final String line = readString();
+        final String line;
+        if (expectShallowInNextLine) {
+    		line = readStringAndConsumeAllShallows();
+            expectShallowInNextLine = false;
+        }
+        else {
+            final String nextLine = readString();
+            if (nextLine.startsWith("shallow ")) {
+                shallows.add(ObjectId.fromString(nextLine.substring("shallow ".length())));
+                line = readStringAndConsumeAllShallows();
+            } else {
+                line = nextLine;
+            }
+        }
+
 		if (line.length() == 0)
 			throw new PackProtocolException(JGitText.get().expectedACKNAKFoundEOF);
 		if ("NAK".equals(line))

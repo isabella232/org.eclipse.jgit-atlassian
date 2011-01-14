@@ -47,9 +47,12 @@
 package org.eclipse.jgit.lib;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -755,6 +758,47 @@ public abstract class Repository {
 			return new HashMap<String, Ref>();
 		}
 	}
+
+    public Set<ObjectId> getShallows() {
+        Set<ObjectId> shallows = new HashSet<ObjectId>();
+        File shallowFile = new File(gitDir, "shallow");
+        if (shallowFile.exists() && shallowFile.isFile()) {
+            try {
+                BufferedReader input = new BufferedReader(new FileReader(shallowFile));
+                String line = null;
+                try {
+                    while ((line = input.readLine()) != null) {
+                        shallows.add(ObjectId.fromString(line));
+                    }
+                } finally {
+                    input.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return shallows;
+    }
+
+    public void addShallows(final Set<ObjectId> newShallows) {
+        Set<ObjectId> currentShallows = getShallows();
+
+        File shallowFile = new File(getDirectory(), "shallow");
+        try {
+            FileWriter fw = new FileWriter(shallowFile, true);
+            try {
+                for (ObjectId shallow : newShallows) {
+                    if (!currentShallows.contains(shallow)) {
+                        fw.write(shallow.name() + "\n");
+                    }
+                }
+            } finally {
+                fw.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	/**
 	 * Peel a possibly unpeeled reference to an annotated tag.

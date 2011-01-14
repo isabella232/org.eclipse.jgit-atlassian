@@ -699,11 +699,11 @@ public class TransportHttp extends HttpTransport implements WalkTransport,
 
 		@Override
 		protected void doFetch(final ProgressMonitor monitor,
-				final Collection<Ref> want, final Set<ObjectId> have)
+				final Collection<Ref> want, final Set<ObjectId> have, final Set<ObjectId> shallows)
 				throws TransportException {
 			final Service svc = new Service(SVC_UPLOAD_PACK);
 			init(svc.in, svc.out);
-			super.doFetch(monitor, want, have);
+			super.doFetch(monitor, want, have, shallows);
 		}
 	}
 
