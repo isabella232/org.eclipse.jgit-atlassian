@@ -250,7 +250,7 @@ public class TransportHttp extends HttpTransport implements WalkTransport,
 
 	private Map<String, String> headers;
 
-	TransportHttp(final Repository local, final URIish uri)
+	protected TransportHttp(final Repository local, final URIish uri)
 			throws NotSupportedException {
 		super(local, uri);
 		try {
