@@ -1029,6 +1029,40 @@ public abstract class Transport {
 	 *             incorrect.
 	 */
 	public FetchResult fetch(final ProgressMonitor monitor,
+							 Collection<RefSpec> toFetch) throws NotSupportedException,
+			TransportException {
+		return fetch(monitor, toFetch, 0);
+	}
+
+	/**
+	 * Fetch objects and refs from the remote repository to the local one.
+	 * <p>
+	 * This is a utility function providing standard fetch behavior. Local
+	 * tracking refs associated with the remote repository are automatically
+	 * updated if this transport was created from a {@link RemoteConfig} with
+	 * fetch RefSpecs defined.
+	 *
+	 * @param monitor
+	 *            progress monitor to inform the user about our processing
+	 *            activity. Must not be null. Use {@link NullProgressMonitor} if
+	 *            progress updates are not interesting or necessary.
+	 * @param toFetch
+	 *            specification of refs to fetch locally. May be null or the
+	 *            empty collection to use the specifications from the
+	 *            RemoteConfig. Source for each RefSpec can't be null.
+     * @param depth
+     *            depth of shallow fetch. May be 0 to indicate deep (normal)
+     *            fetch
+	 * @return information describing the tracking refs updated.
+	 * @throws NotSupportedException
+	 *             this transport implementation does not support fetching
+	 *             objects.
+	 * @throws TransportException
+	 *             the remote connection could not be established or object
+	 *             copying (if necessary) failed or update specification was
+	 *             incorrect.
+	 */
+	public FetchResult fetch(final ProgressMonitor monitor,
 			Collection<RefSpec> toFetch, final int depth) throws NotSupportedException,
 			TransportException {
 		if (toFetch == null || toFetch.isEmpty()) {
