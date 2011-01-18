@@ -238,7 +238,7 @@ public class TransportHttp extends HttpTransport implements WalkTransport,
 
 	private HttpAuthMethod authMethod = HttpAuthMethod.NONE;
 
-	TransportHttp(final Repository local, final URIish uri)
+	protected TransportHttp(final Repository local, final URIish uri)
 			throws NotSupportedException {
 		super(local, uri);
 		try {
@@ -471,7 +471,7 @@ public class TransportHttp extends HttpTransport implements WalkTransport,
 		return httpOpen(METHOD_GET, u);
 	}
 
-	final HttpURLConnection httpOpen(String method, URL u) throws IOException {
+	protected HttpURLConnection httpOpen(String method, URL u) throws IOException {
 		final Proxy proxy = HttpSupport.proxyFor(proxySelector, u);
 		HttpURLConnection conn = (HttpURLConnection) u.openConnection(proxy);
 
