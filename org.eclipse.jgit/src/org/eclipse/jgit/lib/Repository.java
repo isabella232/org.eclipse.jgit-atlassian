@@ -127,6 +127,9 @@ public abstract class Repository {
 	/** If not bare, the index file caching the working file states. */
 	private final File indexFile;
 
+	/** Cache for shallow file contents */
+	private Set<ObjectId> shallowChangesets;
+
 	/**
 	 * Initialize a new repository instance.
 	 *
@@ -940,36 +943,39 @@ public abstract class Repository {
 	}
 
     public Set<ObjectId> getShallows() {
-        Set<ObjectId> shallows = new HashSet<ObjectId>();
-        File shallowFile = new File(gitDir, "shallow");
-        if (shallowFile.exists() && shallowFile.isFile()) {
-            try {
-                BufferedReader input = new BufferedReader(new FileReader(shallowFile));
-                String line = null;
-                try {
-                    while ((line = input.readLine()) != null) {
-                        shallows.add(ObjectId.fromString(line));
-                    }
-                } finally {
-                    input.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return shallows;
+		if (shallowChangesets == null) {
+			shallowChangesets = new HashSet<ObjectId>();
+			File shallowFile = getFS().resolve(getDirectory(), "shallow");
+			if (shallowFile.exists() && shallowFile.isFile()) {
+				try {
+					BufferedReader input = new BufferedReader(new FileReader(shallowFile));
+					try {
+						String line;
+						while ((line = input.readLine()) != null) {
+							shallowChangesets.add(ObjectId.fromString(line));
+						}
+					} finally {
+						input.close();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+        return shallowChangesets;
     }
 
     public void addShallows(final Set<ObjectId> newShallows) {
-        Set<ObjectId> currentShallows = getShallows();
-
-        File shallowFile = new File(getDirectory(), "shallow");
+        getShallows(); // ensure the cache is populated
+        File shallowFile = getFS().resolve(getDirectory(), "shallow");
         try {
             FileWriter fw = new FileWriter(shallowFile, true);
             try {
                 for (ObjectId shallow : newShallows) {
-                    if (!currentShallows.contains(shallow)) {
+                    if (!shallowChangesets.contains(shallow)) {
                         fw.write(shallow.name() + "\n");
+						shallowChangesets.add(shallow);
                     }
                 }
             } finally {
