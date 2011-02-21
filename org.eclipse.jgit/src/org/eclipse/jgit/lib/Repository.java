@@ -851,6 +851,9 @@ public abstract class Repository {
     }
 
     public void addShallows(final Set<ObjectId> newShallows) {
+		if (newShallows.isEmpty()) {
+			return;
+		}
         getShallows(); // ensure the cache is populated
         File shallowFile = getFS().resolve(getDirectory(), "shallow");
         try {
