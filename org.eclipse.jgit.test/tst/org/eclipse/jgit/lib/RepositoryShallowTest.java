@@ -146,6 +146,16 @@ public class RepositoryShallowTest extends RepositoryTestCase {
 
 	}
 
+	public void testNotCreatingEmptyShallowFile() throws Exception {
+		assertFalse(shallowFile.exists());
+		db.addShallows(Collections.<ObjectId>emptySet());
+
+		Set<ObjectId> shallows = db.getShallows();
+		assertTrue(shallows.isEmpty());
+
+		assertFalse(shallowFile.exists());
+	}
+
 	private static List<ObjectId> toObjectIds(String... shas) {
 		List<ObjectId> objectIds = new ArrayList<ObjectId>(shas.length);
 		for (String sha : shas) {
