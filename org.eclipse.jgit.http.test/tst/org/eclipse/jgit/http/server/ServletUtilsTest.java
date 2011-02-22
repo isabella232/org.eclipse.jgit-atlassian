@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2008-2009, Google Inc.
- * Copyright (C) 2008, Imran M Yousuf <imyousuf@smartitengineering.com>
- * Copyright (C) 2008, Jonas Fonseca <fonseca@diku.dk>
+ * Copyright (C) 2011, Google Inc.
  * and other copyright owners as documented in the project's IP log.
  *
  * This program and the accompanying materials are made available
@@ -43,37 +41,24 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.eclipse.jgit.util;
+package org.eclipse.jgit.http.server;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public abstract class JGitTestUtil {
-	public static final String CLASSPATH_TO_RESOURCES = "org/eclipse/jgit/test/resources/";
+import org.junit.Test;
 
-	private JGitTestUtil() {
-		throw new UnsupportedOperationException();
-	}
+public class ServletUtilsTest {
+	@Test
+	public void testAcceptGzip() {
+		assertFalse(ServletUtils.acceptsGzipEncoding((String) null));
+		assertFalse(ServletUtils.acceptsGzipEncoding(""));
 
-	public static File getTestResourceFile(final String fileName) {
-		if (fileName == null || fileName.length() <= 0) {
-			return null;
-		}
-		final URL url = cl().getResource(CLASSPATH_TO_RESOURCES + fileName);
-		if (url == null) {
-			// If URL is null then try to load it as it was being
-			// loaded previously
-			return new File("tst", fileName);
-		}
-		try {
-			return new File(url.toURI());
-		} catch(URISyntaxException e) {
-			return new File(url.getPath());
-		}
-	}
+		assertTrue(ServletUtils.acceptsGzipEncoding("gzip"));
+		assertTrue(ServletUtils.acceptsGzipEncoding("deflate,gzip"));
+		assertTrue(ServletUtils.acceptsGzipEncoding("gzip,deflate"));
 
-	private static ClassLoader cl() {
-		return JGitTestUtil.class.getClassLoader();
+		assertFalse(ServletUtils.acceptsGzipEncoding("gzip(proxy)"));
+		assertFalse(ServletUtils.acceptsGzipEncoding("proxy-gzip"));
 	}
 }

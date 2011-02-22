@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2007, Shawn O. Pearce <spearce@spearce.org>
+ * Copyright (C) 2008-2009, Google Inc.
  * and other copyright owners as documented in the project's IP log.
  *
  * This program and the accompanying materials are made available
@@ -41,31 +41,32 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.eclipse.jgit.lib;
+package org.eclipse.jgit.transport;
 
-import java.util.Date;
-import java.util.TimeZone;
+import org.eclipse.jgit.lib.Config;
+import org.eclipse.jgit.lib.Config.SectionParser;
 
-import junit.framework.TestCase;
+/**
+ * The standard "transfer", "fetch" and "receive" configuration parameters.
+ */
+public class TransferConfig {
+	/** Key for {@link Config#get(SectionParser)}. */
+	public static final Config.SectionParser<TransferConfig> KEY = new SectionParser<TransferConfig>() {
+		public TransferConfig parse(final Config cfg) {
+			return new TransferConfig(cfg);
+		}
+	};
 
-public class T0001_PersonIdent extends TestCase {
-	public void test001_NewIdent() {
-		final PersonIdent p = new PersonIdent("A U Thor", "author@example.com",
-				new Date(1142878501000L), TimeZone.getTimeZone("EST"));
-		assertEquals("A U Thor", p.getName());
-		assertEquals("author@example.com", p.getEmailAddress());
-		assertEquals(1142878501000L, p.getWhen().getTime());
-		assertEquals("A U Thor <author@example.com> 1142878501 -0500",
-				p.toExternalString());
+	private final boolean fsckObjects;
+
+	private TransferConfig(final Config rc) {
+		fsckObjects = rc.getBoolean("receive", "fsckobjects", false);
 	}
 
-	public void test002_NewIdent() {
-		final PersonIdent p = new PersonIdent("A U Thor", "author@example.com",
-				new Date(1142878501000L), TimeZone.getTimeZone("GMT+0230"));
-		assertEquals("A U Thor", p.getName());
-		assertEquals("author@example.com", p.getEmailAddress());
-		assertEquals(1142878501000L, p.getWhen().getTime());
-		assertEquals("A U Thor <author@example.com> 1142878501 +0230",
-				p.toExternalString());
+	/**
+	 * @return strictly verify received objects?
+	 */
+	public boolean isFsckObjects() {
+		return fsckObjects;
 	}
 }
