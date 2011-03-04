@@ -229,7 +229,7 @@ public abstract class BasePackFetchConnection extends BasePackConnection
 			throws TransportException {
 		markStartedOperation();
         this.depth = depth;
-		doFetch(monitor, want, shallow, have);
+		doFetch(monitor, want, have, shallow);
 	}
 
 	public boolean didFetchIncludeTags() {
