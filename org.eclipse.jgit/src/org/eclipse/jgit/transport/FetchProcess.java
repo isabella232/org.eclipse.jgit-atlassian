@@ -167,8 +167,9 @@ class FetchProcess {
 				have.addAll(askFor.keySet());
 				askFor.clear();
 				for (final Ref r : additionalTags) {
-					final ObjectId id = r.getPeeledObjectId();
-					if (id == null || transport.local.hasObject(id))
+					final ObjectId tagId = r.getObjectId();
+					final ObjectId peeledId = r.getPeeledObjectId();
+					if ((peeledId != null && transport.local.hasObject(peeledId)) || transport.local.hasObject(tagId))
 						wantTag(r);
 				}
 
