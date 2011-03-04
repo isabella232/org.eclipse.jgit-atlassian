@@ -304,7 +304,7 @@ public abstract class BasePackFetchConnection extends BasePackConnection
 			final Collection<Ref> want, final Set<ObjectId> have, final Set<ObjectId> shallow, final int depth,
 			OutputStream outputStream) throws TransportException {
 		markStartedOperation();
-		this.depth = depth;
+        this.depth = depth;
 		doFetch(monitor, want, have, shallow, outputStream);
 	}
 
