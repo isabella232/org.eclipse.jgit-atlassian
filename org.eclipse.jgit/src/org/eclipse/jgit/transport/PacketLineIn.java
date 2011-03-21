@@ -91,7 +91,11 @@ public class PacketLineIn {
 	private final byte[] lineBuffer;
 
     boolean expectShallowInNextLine = false;
+
     public Set<ObjectId> shallows = new HashSet<ObjectId>();
+    
+    public Set<ObjectId> unshallows = new HashSet<ObjectId>();
+
 	/**
 	 * Create a new packet line reader.
 	 *
@@ -108,6 +112,8 @@ public class PacketLineIn {
             final String line = readString();
             if (line.startsWith("shallow ")) {
                 shallows.add(ObjectId.fromString(line.substring("shallow ".length())));
+            } else if (line.startsWith("unshallow ")) {
+                unshallows.add(ObjectId.fromString(line.substring("unshallow ".length())));
             } else if (line.length() == 0) {
                 return readString();
             } else {

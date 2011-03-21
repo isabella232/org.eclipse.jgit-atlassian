@@ -291,6 +291,7 @@ public abstract class BasePackFetchConnection extends BasePackConnection
 				pckState = null;
 
                 local.addShallows(pckIn.shallows);
+                local.removeShallows(pckIn.unshallows);
 
 				receivePack(monitor);
 			}
