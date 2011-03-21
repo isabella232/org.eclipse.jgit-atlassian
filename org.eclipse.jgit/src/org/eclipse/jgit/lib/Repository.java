@@ -966,6 +966,28 @@ public abstract class Repository {
         return shallowChangesets;
     }
 
+    public void removeShallows(final Set<ObjectId> unshallows) {
+        if (unshallows.isEmpty()) {
+            return;
+        }
+        getShallows();
+        shallowChangesets.removeAll(unshallows);
+
+        File shallowFile = getFS().resolve(getDirectory(), "shallow");
+        try {
+            FileWriter fw = new FileWriter(shallowFile);
+            try {
+                for (ObjectId shallow : shallowChangesets) {
+                    fw.write(shallow.name() + "\n");
+                }
+            } finally {
+                fw.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void addShallows(final Set<ObjectId> newShallows) {
 		if (newShallows.isEmpty()) {
 			return;
