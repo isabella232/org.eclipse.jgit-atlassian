@@ -44,9 +44,16 @@
 package org.eclipse.jgit.lib;
 
 import org.eclipse.jgit.util.StringUtils;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.*;
 import java.util.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 public class RepositoryShallowTest extends RepositoryTestCase {
 	private static final String[] SHAS = {
@@ -59,17 +66,20 @@ public class RepositoryShallowTest extends RepositoryTestCase {
 	private File shallowFile;
 
 	@Override
+    @Before
 	public void setUp() throws Exception {
 		super.setUp();
 		shallowFile = new File(db.getDirectory(), "shallow");
 	}
 
+    @Test
 	public void testReadingExistingFile() throws Exception {
 		String contents = StringUtils.join(Arrays.asList(SHAS), "\n") + "\n";
 		write(shallowFile, contents);
 		assertEquals(ALL_SHAS, db.getShallows());
 	}
 
+    @Test
 	public void testShallowHandleNoShallowFile() throws IOException {
 		assertFalse(shallowFile.exists());
 
@@ -82,6 +92,7 @@ public class RepositoryShallowTest extends RepositoryTestCase {
 		assertEquals(ALL_SHAS, new HashSet<ObjectId>(readShallowFile()));
 	}
 
+    @Test
 	public void testShallowHandleEmptyShallowFile() throws IOException {
 		assertFalse(shallowFile.exists());
 		assertTrue(shallowFile.createNewFile());
@@ -95,6 +106,7 @@ public class RepositoryShallowTest extends RepositoryTestCase {
 		assertEquals(ALL_SHAS, new HashSet<ObjectId>(readShallowFile()));
 	}
 
+    @Test
 	public void testShallowHandleHalfFullShallowFile() throws IOException {
 		write(shallowFile, SHAS[0] + "\n");
 
@@ -105,7 +117,8 @@ public class RepositoryShallowTest extends RepositoryTestCase {
 		assertEquals(ALL_SHAS, db.getShallows());
 		assertEquals(ALL_SHAS, new HashSet<ObjectId>(readShallowFile()));
 	}
-	
+
+    @Test
 	public void testShallowHandleDisjointShallowFile() throws IOException {
 		String newSha = "f73b95671f326616d66b2afb3bdfcdbbce110b44";
 		write(shallowFile, newSha + "\n");
@@ -122,6 +135,7 @@ public class RepositoryShallowTest extends RepositoryTestCase {
 		assertEquals(expected, new HashSet<ObjectId>(readShallowFile()));
 	}
 
+    @Test
 	public void testShallowHandleOverlappingShallowFile() throws IOException {
 		String newSha = "f73b95671f326616d66b2afb3bdfcdbbce110b44";
 		write(shallowFile, newSha + "\n" + SHAS[0] + "\n");
@@ -136,6 +150,7 @@ public class RepositoryShallowTest extends RepositoryTestCase {
 		assertEquals(expected, new HashSet<ObjectId>(fromFile));
 	}
 
+    @Test
 	public void testCacheEffective() throws Exception {
 		String contents = StringUtils.join(Arrays.asList(SHAS), "\n") + "\n";
 		write(shallowFile, contents);
@@ -146,6 +161,7 @@ public class RepositoryShallowTest extends RepositoryTestCase {
 
 	}
 
+    @Test
 	public void testNotCreatingEmptyShallowFile() throws Exception {
 		assertFalse(shallowFile.exists());
 		db.addShallows(Collections.<ObjectId>emptySet());
