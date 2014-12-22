@@ -43,6 +43,7 @@
 
 package org.eclipse.jgit.lib;
 
+import org.eclipse.jgit.junit.RepositoryTestCase;
 import org.eclipse.jgit.util.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +56,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class RepositoryShallowTest extends RepositoryTestCase {
+public class RepositoryShallowTest extends RepositoryTestCase
+{
 	private static final String[] SHAS = {
 		"49322bb17d3acc9146f98c97d078513228bbf3c0",
 		"6e1475206e57110fcef4b92320436c1e9872a322",
