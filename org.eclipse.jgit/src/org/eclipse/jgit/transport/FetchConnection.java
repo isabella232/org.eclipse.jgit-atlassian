@@ -150,7 +150,7 @@ public interface FetchConnection extends Connection {
 	 * @since 3.0
 	 */
 	public void fetch(final ProgressMonitor monitor,
-			final Collection<Ref> want, final Set<ObjectId> have,
+			final Collection<Ref> want, final Set<ObjectId> have, final Set<ObjectId> shallows, final int depth,
 			OutputStream out) throws TransportException;
 
 	/**
