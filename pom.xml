@@ -546,15 +546,10 @@
 
   <distributionManagement>
     <repository>
-      <id>atlassian-m2-repository</id>
+      <id>atlassian-public</id>
       <name>Atlassian Public Repository</name>
       <url>https://maven.atlassian.com/public</url>
     </repository>
-    <snapshotRepository>
-      <id>atlassian-m2-snapshot-repository</id>
-      <name>Atlassian Public Snapshot Repository</name>
-      <url>https://maven.atlassian.com/public-snapshot</url>
-    </snapshotRepository>
   </distributionManagement>
 
   <profiles>
