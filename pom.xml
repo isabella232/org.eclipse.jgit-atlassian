@@ -546,21 +546,15 @@
 
   <distributionManagement>
     <repository>
-      <id>repo.eclipse.org</id>
-      <name>JGit Maven Repository - Releases</name>
-      <url>https://repo.eclipse.org/content/repositories/jgit-releases/</url>
+      <id>atlassian-m2-repository</id>
+      <name>Atlassian Public Repository</name>
+      <url>https://maven.atlassian.com/public</url>
     </repository>
     <snapshotRepository>
-      <id>repo.eclipse.org</id>
-      <name>JGit Maven Repository - Snapshots</name>
-      <url>https://repo.eclipse.org/content/repositories/jgit-snapshots/</url>
-      <uniqueVersion>true</uniqueVersion>
+      <id>atlassian-m2-snapshot-repository</id>
+      <name>Atlassian Public Snapshot Repository</name>
+      <url>https://maven.atlassian.com/public-snapshot</url>
     </snapshotRepository>
-    <site>
-      <id>jgit.website</id>
-      <name>JGit Website</name>
-      <url>${jgit.website.url}</url>
-    </site>
   </distributionManagement>
 
   <profiles>
