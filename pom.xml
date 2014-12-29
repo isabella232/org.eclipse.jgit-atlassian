@@ -548,7 +548,7 @@
     <repository>
       <id>atlassian-3rdparty</id>
       <name>Atlassian 3rd Party Repository</name>
-      <url>https://maven.atlassian.com/atlassian-3rdparty</url>
+      <url>https://maven.atlassian.com/3rdparty</url>
     </repository>
   </distributionManagement>
 
