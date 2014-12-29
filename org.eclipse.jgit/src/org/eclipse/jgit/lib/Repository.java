@@ -81,6 +81,7 @@ import org.eclipse.jgit.events.IndexChangedListener;
 import org.eclipse.jgit.events.ListenerList;
 import org.eclipse.jgit.events.RepositoryEvent;
 import org.eclipse.jgit.internal.JGitText;
+import org.eclipse.jgit.internal.storage.file.ObjectDirectory;
 import org.eclipse.jgit.revwalk.RevBlob;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevObject;
@@ -126,9 +127,6 @@ public abstract class Repository {
 
 	/** If not bare, the index file caching the working file states. */
 	private final File indexFile;
-
-	/** Cache for shallow file contents */
-	private Set<ObjectId> shallowChangesets;
 
 	/**
 	 * Initialize a new repository instance.
@@ -942,38 +940,34 @@ public abstract class Repository {
 		}
 	}
 
-    public Set<ObjectId> getShallows() {
-		if (shallowChangesets == null) {
-			shallowChangesets = new HashSet<ObjectId>();
-			File shallowFile = getFS().resolve(getDirectory(), "shallow");
-			if (shallowFile.exists() && shallowFile.isFile()) {
-				try {
-					BufferedReader input = new BufferedReader(new FileReader(shallowFile));
-					try {
-						String line;
-						while ((line = input.readLine()) != null) {
-							shallowChangesets.add(ObjectId.fromString(line));
-						}
-					} finally {
-						input.close();
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+    public Set<ObjectId> getShallows()
+	{
+		final ObjectDatabase objectDatabase = getObjectDatabase();
+		if (objectDatabase instanceof ObjectDirectory)
+		{
+			try
+			{
+				return ((ObjectDirectory) objectDatabase).getShallowCommits();
 			}
-
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 		}
-        return shallowChangesets;
+
+		return Collections.emptySet();
     }
 
-    public void removeShallows(final Set<ObjectId> unshallows) {
+    public void removeShallows(final Set<ObjectId> unshallows)
+	{
         if (unshallows.isEmpty()) {
             return;
         }
-        getShallows();
+
+		final Set<ObjectId> shallowChangesets = new HashSet<ObjectId>(getShallows());
         shallowChangesets.removeAll(unshallows);
 
-        File shallowFile = getFS().resolve(getDirectory(), "shallow");
+        File shallowFile = getFS().resolve(getDirectory(), Constants.SHALLOW);
         try {
             FileWriter fw = new FileWriter(shallowFile);
             try {
@@ -988,12 +982,15 @@ public abstract class Repository {
         }
     }
 
-    public void addShallows(final Set<ObjectId> newShallows) {
+    public void addShallows(final Set<ObjectId> newShallows)
+	{
 		if (newShallows.isEmpty()) {
 			return;
 		}
-        getShallows(); // ensure the cache is populated
-        File shallowFile = getFS().resolve(getDirectory(), "shallow");
+
+		final Set<ObjectId> shallowChangesets = new HashSet<ObjectId>(getShallows());
+
+		File shallowFile = getFS().resolve(getDirectory(), Constants.SHALLOW);
         try {
             FileWriter fw = new FileWriter(shallowFile, true);
             try {

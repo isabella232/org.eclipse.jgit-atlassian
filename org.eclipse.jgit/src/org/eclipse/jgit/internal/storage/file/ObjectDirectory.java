@@ -619,7 +619,7 @@ public class ObjectDirectory extends FileObjectDatabase {
 	}
 
 	@Override
-	Set<ObjectId> getShallowCommits() throws IOException {
+	public Set<ObjectId> getShallowCommits() throws IOException {
 		if (shallowFile == null || !shallowFile.isFile())
 			return Collections.emptySet();
 

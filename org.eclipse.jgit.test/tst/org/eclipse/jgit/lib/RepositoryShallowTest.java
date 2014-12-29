@@ -50,6 +50,7 @@ import org.junit.Test;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -71,7 +72,7 @@ public class RepositoryShallowTest extends RepositoryTestCase
     @Before
 	public void setUp() throws Exception {
 		super.setUp();
-		shallowFile = new File(db.getDirectory(), "shallow");
+		shallowFile = new File(db.getDirectory(), Constants.SHALLOW);
 	}
 
     @Test
@@ -156,6 +157,9 @@ public class RepositoryShallowTest extends RepositoryTestCase
 	public void testCacheEffective() throws Exception {
 		String contents = StringUtils.join(Arrays.asList(SHAS), "\n") + "\n";
 		write(shallowFile, contents);
+		// jGit assumes that file not older than 2.5 seconds is modified
+		TimeUnit.SECONDS.sleep(3);
+
 		Set<ObjectId> s1 = db.getShallows();
 		Set<ObjectId> s2 = db.getShallows();
 
