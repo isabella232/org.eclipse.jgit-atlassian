@@ -5,7 +5,7 @@ MVN_RELEASE_PLUGIN=org.apache.maven.plugins:maven-release-plugin:2.5.1
 MAVEN=mvn
 VERSION_BASE=3.5.3
 VERSION_TAG=3.5.3.201412180710-r
-RELEASE_VERSION=${VERSION_TAG}-atlassian-7
+RELEASE_VERSION=${VERSION_TAG}-atlassian-8
 
 ${MAVEN} $MVN_RELEASE_PLUGIN:clean
 ${MAVEN} $MVN_RELEASE_PLUGIN:prepare -e \
