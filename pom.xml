@@ -61,8 +61,8 @@
   </description>
 
   <scm>
-    <url>http://egit.eclipse.org/w/?p=jgit.git</url>
-    <connection>scm:git:git://egit.eclipse.org/jgit.git</connection>
+    <url>https://github.com/atlassian/org.eclipse.jgit-atlassian</url>
+    <connection>scm:git:git://github.com:atlassian/org.eclipse.jgit-atlassian</connection>
   </scm>
 
   <developers>
