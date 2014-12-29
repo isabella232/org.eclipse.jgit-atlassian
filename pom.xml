@@ -43,13 +43,15 @@
    ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.eclipse.jgit</groupId>
   <artifactId>org.eclipse.jgit-parent</artifactId>
   <packaging>pom</packaging>
-  <version>3.5.3.201412180710-r-atlassian-3</version>
+  <version>3.5.3-SNAPSHOT</version>
 
   <name>JGit - Parent</name>
   <url>${jgit-url}</url>
@@ -61,7 +63,6 @@
   <scm>
     <url>https://github.com/atlassian/org.eclipse.jgit-atlassian</url>
     <connection>scm:git:ssh://git@github.com:atlassian/org.eclipse.jgit-atlassian</connection>
-    <tag>org.eclipse.jgit-parent-3.5.3.201412180710-r-atlassian-3</tag>
   </scm>
 
   <developers>
@@ -390,9 +391,9 @@
             <phase>generate-resources</phase>
             <configuration>
               <target if="${translate-qualifier}">
-                <copy file="META-INF/MANIFEST.MF" tofile="${bundle-manifest}" overwrite="true" />
+                <copy file="META-INF/MANIFEST.MF" tofile="${bundle-manifest}" overwrite="true"/>
                 <replace file="${bundle-manifest}">
-                  <replacefilter token=".qualifier" value=".${maven.build.timestamp}" />
+                  <replacefilter token=".qualifier" value=".${maven.build.timestamp}"/>
                 </replace>
               </target>
             </configuration>
