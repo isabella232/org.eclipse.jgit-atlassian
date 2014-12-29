@@ -62,7 +62,7 @@
 
   <scm>
     <url>https://github.com/atlassian/org.eclipse.jgit-atlassian</url>
-    <connection>scm:git:git://github.com:atlassian/org.eclipse.jgit-atlassian</connection>
+    <connection>scm:git:ssh://git@github.com:atlassian/org.eclipse.jgit-atlassian</connection>
   </scm>
 
   <developers>
