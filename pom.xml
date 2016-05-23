@@ -550,6 +550,10 @@
       <name>Atlassian 3rd Party Repository</name>
       <url>https://maven.atlassian.com/3rdparty</url>
     </repository>
+    <snapshotRepository>
+      <id>atlassian-3rdparty-snapshot</id>
+      <url>https://maven.atlassian.com/3rdparty-snapshot</url>
+    </snapshotRepository>
   </distributionManagement>
 
   <profiles>
